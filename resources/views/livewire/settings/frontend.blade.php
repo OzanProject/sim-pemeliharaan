@@ -32,7 +32,10 @@ new #[Layout('backend.layouts.app')] class extends Component {
         }
 
         foreach ($this->settings as $key => $value) {
-            FrontendSetting::where('key', $key)->update(['value' => $value]);
+            FrontendSetting::updateOrCreate(
+                ['key' => $key],
+                ['value' => $value]
+            );
         }
 
         $this->dispatch('swal', title: 'Pengaturan Halaman Depan berhasil diperbarui.', icon: 'success');

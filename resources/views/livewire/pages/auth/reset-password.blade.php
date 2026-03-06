@@ -10,27 +10,21 @@ use Livewire\Attributes\Layout;
 use Livewire\Attributes\Locked;
 use Livewire\Volt\Component;
 
-new #[Layout('layouts.guest')] class extends Component
-{
+new #[Layout('layouts.guest')] class extends Component {
     #[Locked]
     public string $token = '';
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public bool $showPassword = false;
+    public bool $showConfirmPassword = false;
 
-    /**
-     * Mount the component.
-     */
     public function mount(string $token): void
     {
         $this->token = $token;
-
         $this->email = request()->string('email');
     }
 
-    /**
-     * Reset the password for the given user.
-     */
     public function resetPassword(): void
     {
         $this->validate([
@@ -39,9 +33,6 @@ new #[Layout('layouts.guest')] class extends Component
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
         ]);
 
-        // Here we will attempt to reset the user's password. If it is successful we
-        // will update the password on an actual user model and persist it to the
-        // database. Otherwise we will parse the error and return the response.
         $status = Password::reset(
             $this->only('email', 'password', 'password_confirmation', 'token'),
             function ($user) {
@@ -54,52 +45,109 @@ new #[Layout('layouts.guest')] class extends Component
             }
         );
 
-        // If the password was successfully reset, we will redirect the user back to
-        // the application's home authenticated view. If there is an error we can
-        // redirect them back to where they came from with their error message.
         if ($status != Password::PASSWORD_RESET) {
             $this->addError('email', __($status));
-
             return;
         }
 
         Session::flash('status', __($status));
-
         $this->redirectRoute('login', navigate: true);
     }
 }; ?>
 
 <div>
-    <form wire:submit="resetPassword">
-        <!-- Email Address -->
+    <!-- Header -->
+    <div style="margin-bottom: 32px;">
+        <div
+            style="width: 52px; height: 52px; border-radius: 16px; background: rgba(17,69,212,0.2); border: 1.5px solid rgba(17,69,212,0.4); display: flex; align-items: center; justify-content: center; margin-bottom: 20px;">
+            <span class="material-symbols-outlined" style="font-size: 26px; color: #818cf8;">password</span>
+        </div>
+        <h2 style="font-size: 26px; font-weight: 900; color: white; margin: 0 0 8px;">Buat Kata Sandi Baru</h2>
+        <p style="color: rgba(255,255,255,0.5); font-size: 14px; margin: 0;">
+            Masukkan kata sandi baru yang kuat dan mudah diingat.
+        </p>
+    </div>
+
+    <form wire:submit="resetPassword" style="display: flex; flex-direction: column; gap: 20px;">
+
+        <!-- Email (readonly) -->
         <div>
-            <x-input-label for="email" :value="__('Email')" />
-            <x-text-input wire:model="email" id="email" class="block mt-1 w-full" type="email" name="email" required autofocus autocomplete="username" />
-            <x-input-error :messages="$errors->get('email')" class="mt-2" />
+            <label class="auth-label">Email</label>
+            <div style="position: relative;">
+                <span class="material-symbols-outlined auth-input-icon">mail</span>
+                <input wire:model="email" id="email" type="email" class="auth-input"
+                    style="opacity: 0.6; cursor: default;" readonly autocomplete="username">
+            </div>
+            @error('email')
+                <p class="auth-error"><span class="material-symbols-outlined" style="font-size:14px">error</span>
+                    {{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Password -->
-        <div class="mt-4">
-            <x-input-label for="password" :value="__('Password')" />
-            <x-text-input wire:model="password" id="password" class="block mt-1 w-full" type="password" name="password" required autocomplete="new-password" />
-            <x-input-error :messages="$errors->get('password')" class="mt-2" />
+        <div>
+            <label class="auth-label">Kata Sandi Baru</label>
+            <div style="position: relative;">
+                <span class="material-symbols-outlined auth-input-icon">lock</span>
+                <input wire:model="password" id="password" type="{{ $showPassword ? 'text' : 'password' }}"
+                    class="auth-input" style="padding-right: 48px;" placeholder="Min. 8 karakter" required
+                    autocomplete="new-password">
+                <button type="button" wire:click="$toggle('showPassword')"
+                    style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.4); padding: 0;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                        {{ $showPassword ? 'visibility_off' : 'visibility' }}
+                    </span>
+                </button>
+            </div>
+            @error('password')
+                <p class="auth-error"><span class="material-symbols-outlined" style="font-size:14px">error</span>
+                    {{ $message }}</p>
+            @enderror
         </div>
 
         <!-- Confirm Password -->
-        <div class="mt-4">
-            <x-input-label for="password_confirmation" :value="__('Confirm Password')" />
-
-            <x-text-input wire:model="password_confirmation" id="password_confirmation" class="block mt-1 w-full"
-                          type="password"
-                          name="password_confirmation" required autocomplete="new-password" />
-
-            <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
+        <div>
+            <label class="auth-label">Konfirmasi Kata Sandi Baru</label>
+            <div style="position: relative;">
+                <span class="material-symbols-outlined auth-input-icon">lock_reset</span>
+                <input wire:model="password_confirmation" type="{{ $showConfirmPassword ? 'text' : 'password' }}"
+                    class="auth-input" style="padding-right: 48px;" placeholder="Ulangi kata sandi baru" required
+                    autocomplete="new-password">
+                <button type="button" wire:click="$toggle('showConfirmPassword')"
+                    style="position: absolute; right: 14px; top: 50%; transform: translateY(-50%); background: none; border: none; cursor: pointer; color: rgba(255,255,255,0.4); padding: 0;">
+                    <span class="material-symbols-outlined" style="font-size: 20px;">
+                        {{ $showConfirmPassword ? 'visibility_off' : 'visibility' }}
+                    </span>
+                </button>
+            </div>
+            @error('password_confirmation')
+                <p class="auth-error"><span class="material-symbols-outlined" style="font-size:14px">error</span>
+                    {{ $message }}</p>
+            @enderror
         </div>
 
-        <div class="flex items-center justify-end mt-4">
-            <x-primary-button>
-                {{ __('Reset Password') }}
-            </x-primary-button>
-        </div>
+        <!-- Submit -->
+        <button type="submit" class="auth-btn" wire:loading.attr="disabled" wire:loading.class="opacity-75">
+            <span wire:loading.remove style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <span class="material-symbols-outlined"
+                    style="font-size: 20px; vertical-align: middle;">check_circle</span>
+                Simpan Kata Sandi Baru
+            </span>
+            <span wire:loading style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <svg style="width:20px;height:20px;animation:spin 1s linear infinite" viewBox="0 0 24 24" fill="none">
+                    <circle cx="12" cy="12" r="10" stroke="white" stroke-width="3" stroke-dasharray="31.4"
+                        stroke-dashoffset="10" stroke-linecap="round" />
+                </svg>
+                Menyimpan...
+            </span>
+        </button>
     </form>
+
+    <style>
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
 </div>

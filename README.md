@@ -225,8 +225,8 @@ Sebelum instalasi, pastikan sistem Bapak/Ibu memiliki:
 ### 1. Clone Repository
 
 ```bash
-git clone https://github.com/username/sim-kendaraan.git
-cd sim-kendaraan
+git clone https://github.com/OzanProject/sim-pemeliharaan.git
+cd sim-pemeliharaan
 ```
 
 ### 2. Install Dependensi PHP

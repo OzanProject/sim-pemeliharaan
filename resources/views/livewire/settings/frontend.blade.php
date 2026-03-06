@@ -114,9 +114,9 @@ new #[Layout('backend.layouts.app')] class extends Component {
                                 </div>
                             </div>
 
-                            <input type="file" wire:model="heroUpload" accept="image/*"
+                            <input type="file" wire:model="heroUpload"
+                                accept="image/png,image/jpg,image/jpeg,image/webp,image/avif,image/gif,image/svg+xml"
                                 class="w-full text-sm text-slate-500 file:mr-4 file:py-2.5 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-colors">
-                            <p class="text-xs text-slate-500 mt-2">Disarankan menggunakan gambar lanskap (16:9) resolusi tinggi.</p>
                         </div>
                     </div>
                 </div>

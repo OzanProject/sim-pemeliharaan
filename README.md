@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="https://ozanproject.site/logo.png" alt="Ozan Project" width="80" style="border-radius:16px"/>
+<img src="https://ozanproject.site/storage/settings/ecbrK3QsMPZnRWo7ZncwBb9NIyyxoCVI3BlIXULq.png" alt="Ozan Project" width="80" style="border-radius:16px"/>
 
 # 🚗 SIM Pemeliharaan Kendaraan Dinas
 
